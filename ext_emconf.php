@@ -3,7 +3,7 @@
 ########################################################################
 # Extension Manager/Repository config file for ext "memolist".
 #
-# Auto generated 05-04-2011 16:48
+# Auto generated 06-10-2011 13:36
 #
 # Manual updates:
 # Only the data in the array - everything else is removed by next
@@ -29,17 +29,17 @@ $EM_CONF[$_EXTKEY] = array(
 	'clearCacheOnLoad' => 0,
 	'lockType' => '',
 	'author_company' => '',
-	'version' => '1.0.0',
+	'version' => '1.1.0',
 	'constraints' => array(
 		'depends' => array(
-			'cms' => '',
+			'typo3' => '4.5.7-6.1.99',
 		),
 		'conflicts' => array(
 		),
 		'suggests' => array(
 		),
 	),
-	'_md5_values_when_last_written' => 'a:4:{s:16:"ext_autoload.php";s:4:"f2dc";s:12:"ext_icon.gif";s:4:"7e66";s:17:"ext_localconf.php";s:4:"0615";s:20:"Classes/Memolist.php";s:4:"49c9";}',
+	'_md5_values_when_last_written' => 'a:4:{s:16:"ext_autoload.php";s:4:"f2dc";s:12:"ext_icon.gif";s:4:"7e66";s:17:"ext_localconf.php";s:4:"ba28";s:20:"Classes/Memolist.php";s:4:"20a2";}',
 	'suggests' => array(
 	),
 );
