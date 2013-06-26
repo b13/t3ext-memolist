@@ -97,10 +97,13 @@ class Tx_Memolist {
 	 * internal function to store a new memolist in the DB / session
 	 * in the userfunc
 	 *
-	 * @param $memos
+	 * @param array $memos the array full with memos
 	 */
 	protected function persist($memos) {
+		// store the new memos
 		$GLOBALS['TSFE']->fe_user->setKey($this->type, $this->namespace, $memos);
+		// persist in DB, done via TYPO3 API
+		$GLOBALS['TSFE']->fe_user->storeSessionData();
 	}
 
 	/**
