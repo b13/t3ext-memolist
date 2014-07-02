@@ -1,4 +1,7 @@
 <?php
+
+namespace B13\Memolist;
+
 /***************************************************************
 *  Copyright notice
 *
@@ -24,13 +27,16 @@
 *
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
+
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * call it wishlist, lookbook, 
  * but this class helps you deal with all the simple 
  * functions to store the items
  * if no "type" 
  */
-class Tx_Memolist {
+class Memolist {
 
 
 	/**
@@ -50,22 +56,17 @@ class Tx_Memolist {
 	 */
 	protected $userObj = NULL;
 
-
 	/**
 	 * constructor for a memolist, with the two configuration
 	 * options
 	 *
 	 * @param string $type ("user" or "ses")
-	 * @param string $userObj (tslib_tsfeuserAuth)
+	 * @param string $userObj (FrontendUserAuthentication)
 	 */
 	public function __construct($type = NULL, $userObj = NULL) {
 
-			// check if there is a user object
-		if ($userObj !== NULL) {
-			$this->userObj = $userObj;
-		} else {
-			$this->userObj = $GLOBALS['TSFE']->fe_user;
-		}
+		// check if there is a user object
+		$this->setUserObj($userObj ?: $GLOBALS['TSFE']->fe_user);
 
 		if ($type) {
 			$this->type = $type;
@@ -76,6 +77,13 @@ class Tx_Memolist {
 				$this->type = 'user';
 			}
 		}
+	}
+
+	/**
+	 * sets the fe_user object to work with
+	 */
+	public function setUserObj($userObj) {
+		$this->userObj = $userObj;
 	}
 	
 	/**
@@ -101,9 +109,9 @@ class Tx_Memolist {
 	 */
 	protected function persist($memos) {
 		// store the new memos
-		$GLOBALS['TSFE']->fe_user->setKey($this->type, $this->namespace, $memos);
+		$this->userObj->setKey($this->type, $this->namespace, $memos);
 		// persist in DB, done via TYPO3 API
-		$GLOBALS['TSFE']->fe_user->storeSessionData();
+		$this->userObj->storeSessionData();
 	}
 
 	/**
@@ -263,12 +271,12 @@ class Tx_Memolist {
 	
 	public function addAjaxItemToMemoList() {
 
-		$namespace = t3lib_div::_GP('namespace');
+		$namespace = GeneralUtility::_GP('namespace');
 		if ($namespace) {
 			$this->setNamespace($namespace);
 		}
 
-		$item = t3lib_div::_GP('memo');
+		$item = GeneralUtility::_GP('memo');
 		$item = intval($item);
 
 		if ($item > 0) {
@@ -280,12 +288,12 @@ class Tx_Memolist {
 
 	public function removeAjaxItemToMemoList() {
 
-		$namespace = t3lib_div::_GP('namespace');
+		$namespace = GeneralUtility::_GP('namespace');
 		if ($namespace) {
 			$this->setNamespace($namespace);
 		}
 
-		$item = t3lib_div::_GP('memo');
+		$item = GeneralUtility::_GP('memo');
 		$item = intval($item);
 	
 		if ($item > 0) {
@@ -293,7 +301,7 @@ class Tx_Memolist {
 			return '1';
 		} else {
 
-			$key = t3lib_div::_GP('key');
+			$key = GeneralUtility::_GP('key');
 			$key = intval($key);
 			$this->removeItemFromMemoList($item, $key);
 			return '1';

@@ -12,19 +12,19 @@ memolistitemspage {
 	config.disableAllHeaderCode = 1
 	config.admPanel = 0
 	10 = USER_INT
-	10.userFunc = Tx_Memolist->getAjaxMemoListItems
+	10.userFunc = B13\\Memolist\\Memolist->getAjaxMemoListItems
 }
 
 memolistaddpage < memolistitemspage
 memolistaddpage {
 	typeNum = 521
-	10.userFunc = Tx_Memolist->addAjaxItemToMemoList
+	10.userFunc = B13\\Memolist\\Memolist->addAjaxItemToMemoList
 }
 
 memolistremovepage < memolistitemspage
 memolistremovepage {
 	typeNum = 522
-	10.userFunc = Tx_Memolist->removeAjaxItemToMemoList
+	10.userFunc = B13\\Memolist\\Memolist->removeAjaxItemToMemoList
 }
 
 ');

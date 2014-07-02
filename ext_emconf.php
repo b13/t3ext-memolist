@@ -16,32 +16,22 @@ $EM_CONF[$_EXTKEY] = array(
 	'category' => 'fe',
 	'author' => 'Benjamin Mack',
 	'author_email' => 'typo3@b13.de',
-	'shy' => '',
+	'author_company' => 'b:dreizehn GmbH',
 	'dependencies' => 'cms',
 	'conflicts' => '',
 	'priority' => '',
-	'module' => '',
 	'state' => 'stable',
-	'internal' => '',
-	'uploadfolder' => 0,
-	'createDirs' => '',
-	'modify_tables' => '',
 	'clearCacheOnLoad' => 0,
-	'lockType' => '',
-	'author_company' => '',
-	'version' => '1.1.0',
+	'version' => '2.0.0',
 	'constraints' => array(
 		'depends' => array(
-			'typo3' => '4.5.7-6.1.99',
+			'typo3' => '6.2.0-6.2.99',
 		),
 		'conflicts' => array(
 		),
 		'suggests' => array(
 		),
-	),
-	'_md5_values_when_last_written' => 'a:4:{s:16:"ext_autoload.php";s:4:"f2dc";s:12:"ext_icon.gif";s:4:"7e66";s:17:"ext_localconf.php";s:4:"ba28";s:20:"Classes/Memolist.php";s:4:"20a2";}',
-	'suggests' => array(
-	),
+	)
 );
 
 ?>
