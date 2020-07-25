@@ -7,7 +7,7 @@
 		"typo3/cms-core": "^6.2 || ^7.0 || ^8.0 || ^9.0"
 	},
 	"replace": {
-		"memolist": "self.version"
+		"typo3-ter/memolist": "self.version"
 	},
 	"extra": {
 		"typo3/cms": {
