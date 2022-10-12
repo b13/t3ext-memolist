@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace B13\Memolist;
 
 /*
@@ -17,40 +19,13 @@ namespace B13\Memolist;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 
-/**
- * call it wishlist, lookbook,
- * but this class helps you deal with all the simple
- * functions to store the items
- * if no "type"
- */
 class Memolist
 {
-    /**
-     * can be "user" or "ses", where it should be saved
-     */
-    protected $type = 'user';
+    protected string $type = 'user';
+    protected string $namespace = 'tx_memolist';
+    protected ?FrontendUserAuthentication $userObj = null;
 
-
-    /**
-     * namespace in session key, "tx_memolist" by default
-     */
-    protected $namespace = 'tx_memolist';
-
-
-    /**
-     * the FE user where the whole memolist should be attached
-     * @var FrontendUserAuthentication
-     */
-    protected $userObj = null;
-
-    /**
-     * constructor for a memolist, with the two configuration
-     * options
-     *
-     * @param string $type ("user" or "ses")
-     * @param FrontendUserAuthentication $userObj
-     */
-    public function __construct($type = null, $userObj = null)
+    public function __construct(string $type = null, FrontendUserAuthentication $userObj = null)
     {
         // check if there is a user object
         $this->setUserObj($userObj ?: $GLOBALS['TSFE']->fe_user);
@@ -66,38 +41,21 @@ class Memolist
         }
     }
 
-    /**
-     * sets the fe_user object to work with
-     * @param $userObj FrontendUserAuthentication
-     */
-    public function setUserObj($userObj)
+    public function setUserObj(FrontendUserAuthentication $userObj)
     {
         $this->userObj = $userObj;
     }
 
-    /**
-     * returns the whole memolist as an array
-     *
-     * @return array
-     * @api
-     */
-    public function getMemolist()
+    public function getMemolist(): array
     {
         $memolist = $this->userObj->getKey($this->type, $this->namespace);
         if (!is_array($memolist)) {
             $memolist = [];
         }
         return $memolist;
-
     }
 
-    /**
-     * internal function to store a new memolist in the DB / session
-     * in the userfunc
-     *
-     * @param array $memos the array full with memos
-     */
-    protected function persist($memos)
+    protected function persist(array $memos)
     {
         // store the new memos
         $this->userObj->setKey($this->type, $this->namespace, $memos);
@@ -106,30 +64,22 @@ class Memolist
     }
 
     /**
-     * check if it's in the users' memo list
-     *
      * @param mixed $item the item to check
-     * @return boolean
      * @api
      */
-    public function isInMemoList($item)
+    public function isInMemoList($item): bool
     {
         $memoList = $this->getMemoList();
         if (count($memoList) > 0) {
-            return (in_array($item, $memoList));
-        } else {
-            return false;
+            return in_array($item, $memoList);
         }
+        return false;
     }
 
     /**
-     * adds an item to the memo list
-     *
      * @param mixed $item the item to store in the memo list
-     * @param bool $key
-     * @return int the number of items in the users' memo list
      */
-    public function addItemToMemoList($item, $key = false)
+    public function addItemToMemoList($item, bool $key = false): int
     {
         $memoList = $this->getMemoList();
         if ($item) {
@@ -145,19 +95,14 @@ class Memolist
         return count($memoList);
     }
 
-
     /**
-     * removes an item from the memo list
-     *
      * @param mixed $item the item to remove from the memo list
-     * @param bool $key
-     * @return int the number of items in the memo list
      */
-    public function removeItemFromMemoList($item, $key = false)
+    public function removeItemFromMemoList($item, string $key = ''): int
     {
         $memoList = $this->getMemoList();
         if ($item) {
-            if ($key === false) {
+            if ($key === '') {
                 if (in_array($item, $memoList)) {
                     $key = array_search($item, $memoList);
                     unset($memoList[$key]);
@@ -172,90 +117,52 @@ class Memolist
         return count($memoList);
     }
 
-
-    /**
-     * one function to add and remove items to the current
-     * memolist
-     *
-     * @param array $addedItems the items to add
-     * @param array $removedItems the items that should be removed
-     * @return void
-     */
-    public function bulkAddAndRemoveItems($addedItems, $removedItems)
+    public function bulkAddAndRemoveItems(array $addedItems = [], array $removedItems = []): void
     {
-        if (is_array($addedItems) || is_array($removedItems)) {
-            $memoList = $this->getMemoList();
+        $memoList = $this->getMemoList();
 
-            if (is_array($addedItems)) {
-                foreach ($addedItems as $item) {
-                    if ($item && !in_array($item, $memoList)) {
-                        $memoList[] = $item;
-                    }
-                }
+        foreach ($addedItems as $item) {
+            if ($item && !in_array($item, $memoList)) {
+                $memoList[] = $item;
             }
-
-            if (is_array($removedItems)) {
-                foreach ($removedItems as $item) {
-                    if ($item && in_array($item, $memoList)) {
-                        $key = array_search($item, $memoList);
-                        unset($memoList[$key]);
-                    }
-                }
-            }
-
-            $this->persist($memoList);
         }
+
+        foreach ($removedItems as $item) {
+            if ($item && in_array($item, $memoList)) {
+                $key = array_search($item, $memoList);
+                unset($memoList[$key]);
+            }
+        }
+
+        $this->persist($memoList);
     }
 
-    /**
-     * removes all items from the memo list list
-     *
-     * @return    void
-     */
-    public function clearMemolist()
+    public function clearMemolist(): void
     {
         $this->persist([]);
     }
 
-    /**
-     * returns the number of items in the users' memo list
-     *
-     * @return    integer    the number of items in the memo list
-     */
-    public function getNumberOfItemsInMemoList()
+    public function getNumberOfItemsInMemoList(): int
     {
         $memoList = $this->getMemoList();
         return count($memoList);
     }
 
-    /**
-     * sets the namespace where the memos should be saved
-     *
-     * @param string $namespace the string that acts as a namespace
-     * @return void
-     */
-    public function setNamespace($namespace)
+    public function setNamespace(string $namespace): void
     {
         $this->namespace = $namespace;
     }
 
-    /**
-     * returns the namespace currently in use
-     *
-     * @return string
-     */
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return $this->namespace;
     }
 
     /**
-     *
      * PUBLIC FUNCTIONS FOR AJAX CALLS
      * need some major overhaul
-     *
      */
-    public function getAjaxMemoListItems()
+    public function getAjaxMemoListItems(): void
     {
         $t3Basket = $this->userObj->getKey($this->type, $this->namespace);
         if (!is_array($t3Basket)) {
@@ -265,11 +172,10 @@ class Memolist
         foreach ($t3Basket as $memoList) {
             $list = implode(',', $memoList);
         }
-        echo('[' . $list . ']');
+        echo '[' . $list . ']';
     }
 
-
-    public function addAjaxItemToMemoList()
+    public function addAjaxItemToMemoList(): string
     {
         $namespace = GeneralUtility::_GP('namespace');
         if ($namespace) {
@@ -286,7 +192,7 @@ class Memolist
         return '0';
     }
 
-    public function removeAjaxItemToMemoList()
+    public function removeAjaxItemToMemoList(): string
     {
         $namespace = GeneralUtility::_GP('namespace');
         if ($namespace) {
@@ -294,17 +200,16 @@ class Memolist
         }
 
         $item = GeneralUtility::_GP('memo');
-        $item = intval($item);
+        $item = (int)$item;
 
         if ($item > 0) {
             $this->removeItemFromMemoList($item);
             return '1';
-        } else {
-
-            $key = GeneralUtility::_GP('key');
-            $key = intval($key);
-            $this->removeItemFromMemoList($item, $key);
-            return '1';
         }
+
+        $key = GeneralUtility::_GP('key');
+        $key = (string)$key;
+        $this->removeItemFromMemoList($item, $key);
+        return '1';
     }
 }
