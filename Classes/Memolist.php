@@ -79,11 +79,11 @@ class Memolist
     /**
      * @param mixed $item the item to store in the memo list
      */
-    public function addItemToMemoList($item, bool $key = false): int
+    public function addItemToMemoList($item, string $key = ''): int
     {
         $memoList = $this->getMemoList();
         if ($item) {
-            if ($key === false) {
+            if ($key === '') {
                 if (!in_array($item, $memoList)) {
                     $memoList[] = $item;
                 }
@@ -105,13 +105,10 @@ class Memolist
             if ($key === '') {
                 if (in_array($item, $memoList)) {
                     $key = array_search($item, $memoList);
-                    unset($memoList[$key]);
-                }
-            } else {
-                if (isset($memoList[$key])) {
-                    unset($memoList[$key]);
                 }
             }
+
+            unset($memoList[$key]);
             $this->persist($memoList);
         }
         return count($memoList);
