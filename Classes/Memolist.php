@@ -35,7 +35,7 @@ class Memolist
         } else {
             // check if the user is logged in, if so, use the
             // user's record, otherwise the session cookie
-            if ($this->userObj->user['uid'] > 0) {
+            if (isset($this->userObj->user['uid']) && $this->userObj->user['uid'] > 0) {
                 $this->type = 'user';
             }
         }
