@@ -7,13 +7,11 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'Benjamin Mack',
     'author_email' => 'typo3@b13.com',
     'author_company' => 'b13 GmbH',
-    'dependencies' => 'frontend',
     'state' => 'stable',
-    'clearCacheOnLoad' => 0,
     'version' => '3.0.2',
     'constraints' => [
         'depends' => [
-            'typo3' => '10.0.0-11.5.99',
+            'typo3' => '12.4.0-12.4.99',
         ],
     ],
 ];

@@ -16,7 +16,7 @@ namespace B13\Memolist;
  * LICENSE.txt file that was distributed with this source code.
  */
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 
 class Memolist
@@ -28,7 +28,7 @@ class Memolist
     public function __construct(string $type = null, FrontendUserAuthentication $userObj = null)
     {
         // check if there is a user object
-        $this->setUserObj($userObj ?: $GLOBALS['TSFE']->fe_user);
+        $this->setUserObj($userObj ?: $this->getFrontendUserObject());
 
         if ($type) {
             $this->type = $type;
@@ -41,7 +41,19 @@ class Memolist
         }
     }
 
-    public function setUserObj(FrontendUserAuthentication $userObj)
+    protected function getFrontendUserObject()
+    {
+        $user = null;
+        if (($GLOBALS['TYPO3_REQUEST'] ?? null) instanceof ServerRequestInterface) {
+            $user = $GLOBALS['TYPO3_REQUEST']->getAttribute('frontend.user');
+        }
+        if ($user === null) {
+            return $GLOBALS['TSFE']->fe_user;
+        }
+        return $user;
+    }
+
+    public function setUserObj(FrontendUserAuthentication $userObj): void
     {
         $this->userObj = $userObj;
     }
@@ -174,13 +186,12 @@ class Memolist
 
     public function addAjaxItemToMemoList(): string
     {
-        $namespace = GeneralUtility::_GP('namespace');
+        $namespace = $this->sanitizeString($_REQUEST['namespace'] ?? '');
         if ($namespace) {
             $this->setNamespace($namespace);
         }
 
-        $item = GeneralUtility::_GP('memo');
-        $item = (int)$item;
+        $item = (int)$_REQUEST['memo'];
 
         if ($item > 0) {
             $this->addItemToMemoList($item);
@@ -191,22 +202,26 @@ class Memolist
 
     public function removeAjaxItemToMemoList(): string
     {
-        $namespace = GeneralUtility::_GP('namespace');
+        $namespace = $this->sanitizeString($_REQUEST['namespace'] ?? '');
         if ($namespace) {
             $this->setNamespace($namespace);
         }
 
-        $item = GeneralUtility::_GP('memo');
-        $item = (int)$item;
+        $item = (int)$_REQUEST['memo'];
 
         if ($item > 0) {
             $this->removeItemFromMemoList($item);
             return '1';
         }
 
-        $key = GeneralUtility::_GP('key');
-        $key = (string)$key;
+        $key = $this->sanitizeString($_REQUEST['key'] ?? '');
         $this->removeItemFromMemoList($item, $key);
         return '1';
+    }
+
+    protected function sanitizeString(mixed $value): string
+    {
+        $value = (string)$value;
+        return trim(htmlspecialchars(strip_tags($value)));
     }
 }
